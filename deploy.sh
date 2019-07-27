@@ -11,4 +11,5 @@ rm -rf "${contentsdir:?}"
 cd "$wwwdir"
 # clone contents
 git clone "https://github.com/$contents_owner/$contents"
+# change owner and group
 chown www-data:www-data "$contentsdir" -R
