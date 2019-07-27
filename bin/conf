@@ -1,0 +1,5 @@
+contents="blog_contents" # post repo
+contents_owner="blacktanktop" # repo ower user name
+wwwdir="/var/www/html/blog"   # repo dir
+contentsdir="$wwwdir/$contents" #repo path
+appdir="$wwwdir/cms" # install path
