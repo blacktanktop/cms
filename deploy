@@ -1,0 +1,28 @@
+#!/bin/bash -eux
+
+# read variable in conf
+source "$(dirname $0)/bin/conf"
+
+[ "$USER" = "root" ]
+
+### install cms
+rsync -av --delete "$(dirname $0)/bin/" "$appdir/"
+chown www-data:www-data "$appdir" -R
+
+### rename cgi
+cd "$appdir"
+rnd=$(cat /dev/urandom | tr -cd 0-9a-zA-Z | head -c 32)
+[ -e "/home/blacktanktop/rnd" ] && rnd=$(cat /home/blacktanktop/rnd ) 
+mv "fetch"  "fetch_$rnd.cgi"
+
+###pull article repo
+# remove contents
+rm -rf "${contentsdir:?}"
+# move contents dir
+cd "$wwwdir"
+# clone contents
+git clone "git@blog_deploy:$contents_owner/$contents"
+# change owner and group
+chown www-data:www-data "$contentsdir" -R
+
+echo "call fetch_$rnd.cgi from GitHub"
