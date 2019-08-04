@@ -3,3 +3,5 @@ contents_owner="blacktanktop" # repo ower user name
 wwwdir="/var/www/html/blog"   # repo dir
 contentsdir="$wwwdir/$contents" #repo path
 appdir="$wwwdir/cms" # install path
+viewdir="$appdir/view" # view dir
+logdir="/var/log/$contents" #log dir
