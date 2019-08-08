@@ -4,7 +4,18 @@ Content-type: text/html
 <html>
 <head> 
     <meta charset="utf-8" />
+    <title>$title$</title>
 </head>
 <body>
-	$body$
+    <header>
+        <span>$created_time$</span>
+	</header>
+        $body$
+    <footer>
+        <p>created: $created_time$,
+            last modified: $modified_time$,
+            keywords: $Keywords$</p>
+        <p>Copyright: $Copyright$</p>
+    </footer>
 </body>
+</html>
