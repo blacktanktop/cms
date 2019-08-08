@@ -7,3 +7,25 @@ echo -e 'Content-type: text/html\n\n'
 
 cd "$contentsdir"
 git pull
+
+## create timestamp file
+# posts, pages以下のdirを探す
+find posts pages -maxdepth 1 -type d	|
+# posts/, pages/ よりも下層に限定する
+grep /					|
+# 一つずつ$dに格納しdo 以下の処理を行う
+while read d
+do
+    # main.mdがあるかどうか
+    [ -f "$contentsdir/$d/main.md" ] &&
+    # あれば$datadirに同じ階層構造のdirをつくる
+    mkdir -p "$datadir/$d"           &&
+    ## add timestamp file
+    git log -p "$contentsdir/$d/main.md" |
+    grep '^Date:'                        |
+    awk '{print $2,$3,$4,$5,$6}'         |
+    date -f - "+%Y-%m-%d %H:%M:%S"       |
+    awk -v cf="$datadir/$d/created_time" \
+        -v mf="$datadir/$d/modified_time" \
+        'NR==1{print > mf}END{print > cf}'
+done
