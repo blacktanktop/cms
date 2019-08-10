@@ -62,6 +62,7 @@ do
     # if(NR==0) : title行がない(#の行がない) (NR==0というのはNRが無いっていうこと)
     awk '{if(/^$/){print "NO TITLE"}else{print}}
         END{if(NR==0){print "NO TITLE"}}'       |
+    # ナビゲーションのためとmeta.yamlでつかう
     tee "$datadir/$d/title"                     |
     # s/を=に置換
     # リンク先をlinkファイルに保存

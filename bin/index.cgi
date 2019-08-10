@@ -28,7 +28,6 @@ counter="$datadir/counters/$(tr '/' '_' <<< $dir)"
 # 都度1と追記。それをファイルサイズでカウントする'$(ls -l "$counter" | cut -d' ' -f 5)'
 echo -n 1 >> "$counter" # increment the counter
 
-# titleは今後ファイル名で管理
 cat << FIN > $tmp-meta.yaml
 ---
 created_time: '$(date -f - < "$datadir/$dir/created_time")'
