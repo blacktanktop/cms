@@ -14,6 +14,10 @@ trap 'rm -f $tmp-*' EXIT
 # $$はプロセス番号
 tmp=/tmp/$$
 dir="$(tr -dc 'a-zA-Z0-9_=' <<< ${QUERY_STRING} | sed 's;=;s/;')"
+# -z は文字列が長さが0なら真つまり空ならdir="pages/top"
+[ -z "$dir" ] && dir="pages/top"
+# 最新postのpathをdirに代入
+[ "$dir" = "post" ] && dir="$(tail -n 1 "$datadir/post_list" | cut -d' ' -f 3)" 
 md="$contentsdir/$dir/main.md"
 #実際のファイルかどうか
 [ -f "$md" ]
