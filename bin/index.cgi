@@ -6,7 +6,7 @@ set -o pipefail
 # このシェルスクリプトが終わるときに'処理'を実行
 trap 'rm -f $tmp-*' EXIT
 
-## Variables
+## variables
 # md="$contentsdir/posts/template/main.md"
 # tr -dc:指定文字列以外は削除
 # sed 's;変換前;変換後;' ;でなく/を使ってもいいがその時はエスケープ
@@ -23,7 +23,8 @@ cat << FIN > $tmp-meta.yaml
 ---
 created_time: '$(date -f - < "$datadir/$dir/created_time")'
 modified_time: '$(date -f - < "$datadir/$dir/modified_time")'
-title: $(grep '^# ' "$md" | sed 's/^# *//')
+title: '$(grep '^# ' "$md" | sed 's/^# *//')'
+nav: '$(cat "$datadir/$dir/nav")'
 ---
 FIN
 

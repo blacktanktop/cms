@@ -29,3 +29,94 @@ do
         -v mf="$datadir/$d/modified_time" \
         'NR==1{print > mf}END{print > cf}'
 done
+
+## delte delted articles
+cd  "$datadir"
+# posts, pages以下のdirを探す
+find posts pages -maxdepth 1 -type d    |
+# posts/, pages/ よりも下層に限定する
+grep /					|
+# 一つずつ$dに格納しdo 以下の処理を行う
+while read d
+do
+    # main.mdがあるかどうか
+    # ある場合は次のループへ
+    # 無い場合は次の処理へ（rm）
+    [ -f "$contentsdir/$d/main.md" ] && continue
+    rm -rf "./$d"
+done
+
+## make shortcut
+find posts pages -maxdepth 1 -type d    |
+grep /					|
+while read d
+do
+    # ある場合は次の処理へ(grep)
+    # 無い場合次のループへ
+    [ -f "$contentsdir/$d/main.md" ] || continue
+    # タイトル行の最初の１つのみ
+    grep -m 1 '^# '  "$contentsdir/$d/main.md"  |
+    # ^#を取り除く
+    sed 's/^# *//'                              |
+    # /^$/: title行の# 以降が空白 >> "NO TITLE"
+    # if(NR==0) : title行がない(#の行がない) (NR==0というのはNRが無いっていうこと)
+    awk '{if(/^$/){print "NO TITLE"}else{print}}
+        END{if(NR==0){print "NO TITLE"}}'       |
+    tee "$datadir/$d/title"                     |
+    # s/を=に置換
+    # リンク先をlinkファイルに保存
+    awk -v d="$d" '{gsub(/s\//,"=",d);
+        print "<a href=\"/?" d "\">" $0 "</a>"}' > "$datadir/$d/link"
+
+    touch "$datadir/$d/nav"
+done
+
+
+## make post/page list
+tmp=/tmp/$$
+
+# list post data
+# created_timeを全部出力
+cd "$datadir"
+find posts pages -type f     |
+grep created_time	     |
+xargs grep -H .		     |
+# /created_time:を へ変換
+# path YMD hmsにする
+sed 's;/created_time:; ;'    |
+# YMD hms pathにする
+awk '{print $2,$3,$1}'       |
+# 時系列順で並べかえ
+sort -k1,2		     |
+# ファイル作りつつパイプ
+tee $tmp-list                |
+# $3に頭がpostsってなているやつ
+# '$列~/パターン/'って感じでかく
+awk '$3~/^posts/'            > $tmp-post_list
+# datadirへ移動
+mv $tmp-post_list "$datadir/post_list"
+
+# list pages data
+awk '$3~/^pages/' $tmp-list  > $tmp-page_list
+mv $tmp-page_list "$datadir/page_list"
+
+## make prev/next navigation links
+cat "$datadir/post_list"                             |
+while read ymd hms d
+do
+	# -C1で検索対象の前も合わせて3行取得
+    grep -C1 "$d$" "$datadir/post_list"     			|
+	awk '{print $3}'                        			|
+	# -n:指示あるもののみ出力, -e:後ろに処理内容書く, 1p:1行目, $p:最終行目
+    sed -n -e '1p' -e '$p'                         			|
+	# xargs -I@とすると 後ろ@に突っ込まれる
+    # ""の中身をcatすると<a href~~~>というリンク
+    xargs -I@ cat "$datadir/@/link"                 		|
+	# 2行未満の時の対策
+    awk 'NR<=2{print}END{for(i=NR;i<2;i++){print "LOST TITLE"}}'	|
+	# sコマンドの前に数字を置くことで対象行を絞って置換を行う
+    sed -e '1s/^/prev:/' -e '2s/^/next:/'				|
+    # 1行に変換。navに記録
+	tr '\n' ' '					> "$datadir/$d/nav"
+done
+
