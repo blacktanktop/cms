@@ -27,6 +27,6 @@ grep " .*$word"                         |
 awk '{print $1}'                        |
 uniq                                    |
 # 100行に限定
-head -n 100                             
+head -n 100                             | 
 xargs -I@ cat "$datadir/@/link_date"    |
 sed 's;$;<br/>;'
