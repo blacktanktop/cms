@@ -146,3 +146,18 @@ sed 's/  */ /g'                  |
 awk '{gsub(/^/,",",$2);print}'   |
 sed 's/$/,/'                     > $tmp-keyword_list
 mv $tmp-keyword_list "$datadir/keyword_list"
+
+### MAKE SEARCH FILE ###
+cd "$contentsdir"
+cat $tmp-list                    |
+awk '{print $3 "/main.md"}'      |
+# 先頭を検索して一行ずつにする
+xargs grep -H ^                  |
+sed 's;/main.md:; ;'             |
+# メタ情報の除去
+awk 'a!=$1{c=0;a=$1}c>=2{print}$2~/^---$/{c++}' |
+# #と*を検索にかけないように
+awk '$2~/^\*$|^#*$/{$2=""}{print}'              |
+# 空行除去
+awk 'NF>1'                      > $tmp-all
+mv $tmp-all "$datadir/all_markdown"
