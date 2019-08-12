@@ -128,3 +128,21 @@ do
 	tr '\n' ' '					> "$datadir/$d/nav"
 done
 
+## make keyword list 
+cd "$contentsdir"
+# posts pagesのymd hms pathデータ 
+cat $tmp-list                    |
+# 記事からmeta-yamlのKeywordsの行を取得
+awk '{print $3 "/main.md"}'      |
+xargs grep -H -m 1 '^Keywords:'  |
+# 文字列の除去
+# main.md:Keywords:の代わりに半角スペース
+sed 's;/main.md:Keywords:; ;'    |
+#, の後の余計なスペースなど
+sed 's/ *, */,/g'                |
+sed 's/  */ /g'                  |
+# cgiの処理上キーワードの前後に,を入れる
+# 前段の半角スペースはこのため
+awk '{gsub(/^/,",",$2);print}'   |
+sed 's/$/,/'                     > $tmp-keyword_list
+mv $tmp-keyword_list "$datadir/keyword_list"
