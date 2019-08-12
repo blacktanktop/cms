@@ -68,6 +68,12 @@ do
     # リンク先をlinkファイルに保存
     awk -v d="$d" '{gsub(/s\//,"=",d);
         print "<a href=\"/?" d "\">" $0 "</a>"}' > "$datadir/$d/link"
+    # 日付付きリンク
+    # 半角スペース以降を無にする
+    ymd=$(sed 's/ .*//' < "$datadir/$d/created_time")
+    # &があるとマッチした場所の前に追記される
+    sed "s;</a>; ($ymd)&;" "$datadir/$d/link" > "$datadir/$d/link_date"
+
 
     touch "$datadir/$d/nav"
 done
