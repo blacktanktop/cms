@@ -1,5 +1,6 @@
 window.onload = function () {
     lastArticles(10);
+    linkKeywords();
 }
 
 function lastArticles(num){
