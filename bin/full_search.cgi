@@ -1,4 +1,5 @@
 #!/bin/bash -xv
+
 source "$(dirname $0)/conf"
 exec 2> "$logdir/$(basename $0).$(date +%Y%m%d_%H%M%S).$$"
 
@@ -11,6 +12,7 @@ numchar=$(nkf -w16B0 <<< "$word" | xxd -plain | tr -d '\n' | sed 's/..../\&#x&;/
 # 送信ボタン
 cat << FIN
 Content-Type: text/html
+
 <h1>Search</h1>
 <input type="text" id="full-search-box" value="$numchar" />
 <button onclick="fullSearch(document.getElementById(
