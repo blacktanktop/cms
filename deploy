@@ -24,7 +24,8 @@ rm -rf "${contentsdir:?}"
 # move contents dir
 cd "$wwwdir"
 # clone contents
-git clone "git@blog_deploy:$contents_owner/$contents"
+# git clone "git@blog_deploy:$contents_owner/$contents"
+ git clone "git@github.com:$contents_owner/$contents"
 # change owner and group
 chown www-data:www-data "$contentsdir" -R
 
