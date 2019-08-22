@@ -1,0 +1,181 @@
+#!/bin/bash -euvx
+source "$(dirname $0)/conf"
+exec 2> "$logdir/$(basename $0).$(date +%Y%m%d_%H%M%S).$$"
+# [ -n "${CONTENT_LENGTH}" ] && dd bs=${CONTENT_LENGTH} > /dev/null
+
+echo -e 'Content-type: text/html\n\n'
+
+date
+echo GitHubからpull
+cd "$contentsdir"
+git pull
+
+date
+echo 記事dirの作成とタイムスタンプ処理
+## create timestamp file
+# posts, pages以下のdirを探す
+find posts pages -maxdepth 1 -type d	|
+# posts/, pages/ よりも下層に限定する
+grep /					|
+# 一つずつ$dに格納しdo 以下の処理を行う
+while read d
+do
+    # main.mdがあるかどうか
+    [ -f "$contentsdir/$d/main.md" ] &&
+    # あれば$datadirに同じ階層構造のdirをつくる
+    mkdir -p "$datadir/$d"           &&
+    ## add timestamp file
+    git log -p "$contentsdir/$d/main.md" |
+    grep '^Date:'                        |
+    awk '{print $2,$3,$4,$5,$6}'         |
+    date -f - "+%Y-%m-%d %H:%M:%S"       |
+    awk -v cf="$datadir/$d/created_time" \
+        -v mf="$datadir/$d/modified_time" \
+        'NR==1{print > mf}END{print > cf}'
+done
+
+date
+echo 記事の削除
+## delte delted articles
+cd  "$datadir"
+# posts, pages以下のdirを探す
+find posts pages -maxdepth 1 -type d    |
+# posts/, pages/ よりも下層に限定する
+grep /					|
+# 一つずつ$dに格納しdo 以下の処理を行う
+while read d
+do
+    # main.mdがあるかどうか
+    # ある場合は次のループへ
+    # 無い場合は次の処理へ（rm）
+    [ -f "$contentsdir/$d/main.md" ] && continue
+    rm -rf "./$d"
+done
+
+date
+echo リンクの作成
+## make shortcut
+find posts pages -maxdepth 1 -type d    |
+grep /					|
+while read d
+do
+    # ある場合は次の処理へ(grep)
+    # 無い場合次のループへ
+    [ -f "$contentsdir/$d/main.md" ] || continue
+    # タイトル行の最初の１つのみ
+    grep -m 1 '^# '  "$contentsdir/$d/main.md"  |
+    # ^#を取り除く
+    sed 's/^# *//'                              |
+    # /^$/: title行の# 以降が空白 >> "NO TITLE"
+    # if(NR==0) : title行がない(#の行がない) (NR==0というのはNRが無いっていうこと)
+    awk '{if(/^$/){print "NO TITLE"}else{print}}
+        END{if(NR==0){print "NO TITLE"}}'       |
+    # ナビゲーションのためとmeta.yamlでつかう
+    tee "$datadir/$d/title"                     |
+    # s/を=に置換
+    # リンク先をlinkファイルに保存
+    awk -v d="$d" '{gsub(/s\//,"=",d);
+        print "<a href=\"/?" d "\">" $0 "</a>"}' > "$datadir/$d/link"
+	
+	# 日付付きリンク
+    # 半角スペース以降を無にする
+    ymd=$(sed 's/ .*//' < "$datadir/$d/created_time")
+    # &があるとマッチした場所の前に追記される
+    sed "s;</a>; ($ymd)&;" "$datadir/$d/link" > "$datadir/$d/link_date"
+
+
+    touch "$datadir/$d/nav"
+done
+
+date
+echo 記リストの作成
+## make post/page list
+tmp=/tmp/$$
+
+# list post data
+# created_timeを全部出力
+cd "$datadir"
+find posts pages -type f     |
+grep created_time	     |
+xargs grep -H .		     |
+# /created_time:を へ変換
+# path YMD hmsにする
+sed 's;/created_time:; ;'    |
+# YMD hms pathにする
+awk '{print $2,$3,$1}'       |
+# 時系列順で並べかえ
+sort -k1,2		     |
+# ファイル作りつつパイプ
+tee $tmp-list                |
+# $3に頭がpostsってなているやつ
+# '$列~/パターン/'って感じでかく
+awk '$3~/^posts/'            > $tmp-post_list
+# datadirへ移動
+mv $tmp-post_list "$datadir/post_list"
+
+# list pages data
+awk '$3~/^pages/' $tmp-list  > $tmp-page_list
+mv $tmp-page_list "$datadir/page_list"
+
+date
+echo 前後の記事リストの作成
+## make prev/next navigation links
+cat "$datadir/post_list"                             |
+while read ymd hms d
+do
+	# -C1で検索対象の前も合わせて3行取得
+    grep -C1 "$d$" "$datadir/post_list"     			|
+	awk '{print $3}'                        			|
+	# -n:指示あるもののみ出力, -e:後ろに処理内容書く, 1p:1行目, $p:最終行目
+    sed -n -e '1p' -e '$p'                         			|
+	# xargs -I@とすると 後ろ@に突っ込まれる
+    # ""の中身をcatすると<a href~~~>というリンク
+    xargs -I@ cat "$datadir/@/link"                 		|
+	# 2行未満の時の対策
+    awk 'NR<=2{print}END{for(i=NR;i<2;i++){print "LOST TITLE"}}'	|
+	# sコマンドの前に数字を置くことで対象行を絞って置換を行う
+    sed -e '1s/^/prev:/' -e '2s/^/next:/'				|
+    # 1行に変換。navに記録
+	tr '\n' ' '					> "$datadir/$d/nav"
+done
+
+date
+echo キーワードリストの作成
+## make keyword list 
+cd "$contentsdir"
+# posts pagesのymd hms pathデータ 
+cat $tmp-list                    |
+# 記事からmeta-yamlのKeywordsの行を取得
+awk '{print $3 "/main.md"}'      |
+xargs grep -H -m 1 '^Keywords:'  |
+# 文字列の除去
+# main.md:Keywords:の代わりに半角スペース
+sed 's;/main.md:Keywords:; ;'    |
+#, の後の余計なスペースなど
+sed 's/ *, */,/g'                |
+sed 's/  */ /g'                  |
+# cgiの処理上キーワードの前後に,を入れる
+# 前段の半角スペースはこのため
+awk '{gsub(/^/,",",$2);print}'   |
+sed 's/$/,/'                     > $tmp-keyword_list
+mv $tmp-keyword_list "$datadir/keyword_list"
+
+date
+echo 検索ファイルの作成
+### MAKE SEARCH FILE ###
+cd "$contentsdir"
+cat $tmp-list                    |
+awk '{print $3 "/main.md"}'      |
+# 先頭を検索して一行ずつにする
+xargs grep -H ^                  |
+sed 's;/main.md:; ;'             |
+# メタ情報の除去
+awk 'a!=$1{c=0;a=$1}c>=2{print}$2~/^---$/{c++}' |
+# #と*を検索にかけないように
+awk '$2~/^\*$|^#*$/{$2=""}{print}'              |
+# 空行除去
+awk 'NF>1'                      > $tmp-all
+mv $tmp-all "$datadir/all_markdown"
+
+date
+echo 終了
