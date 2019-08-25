@@ -20,7 +20,7 @@ find posts pages -type d       |
 grep -Eo '(posts|pages)/[^/]+' > $tmp-git-change
 
 rm -f "$datadir/INIT"
-
+cat $tmp-git-change > /tmp/diff
 ## create/delete article directory 
 # 変更があったものだけcatする
 cat $tmp-git-change |
