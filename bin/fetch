@@ -66,7 +66,10 @@ do
 done
 
 ## make post/page list
-tmp=/tmp/$$
+#tmp=/tmp/$$
+touch "$datadir/post_list"
+# 更新前のリストを別のtmp-old-post-listに保存
+cp "$datadir/post_list" $tmp-old-post-list
 
 # list post data
 # created_timeを全部出力
@@ -85,32 +88,35 @@ sort -k1,2		     |
 tee $tmp-list                |
 # $3に頭がpostsってなているやつ
 # '$列~/パターン/'って感じでかく
+# 更新後のリストを$tmp-post_listに保存
 awk '$3~/^posts/'            > $tmp-post_list
-# datadirへ移動
+# datadirへ移動してpost_listへ保存
 mv $tmp-post_list "$datadir/post_list"
 
 # list pages data
 awk '$3~/^pages/' $tmp-list  > $tmp-page_list
 mv $tmp-page_list "$datadir/page_list"
 
-## make prev/next navigation links
-cat "$datadir/post_list"                             |
-while read ymd hms d
-do
-	# -C1で検索対象の前も合わせて3行取得
-    grep -C1 "$d$" "$datadir/post_list"     			|
-	awk '{print $3}'                        			|
-	# -n:指示あるもののみ出力, -e:後ろに処理内容書く, 1p:1行目, $p:最終行目
-    sed -n -e '1p' -e '$p'                         			|
-	# xargs -I@とすると 後ろ@に突っ込まれる
-    # ""の中身をcatすると<a href~~~>というリンク
-    xargs -I@ cat "$datadir/@/link"                 		|
-	# 2行未満の時の対策
-    awk 'NR<=2{print}END{for(i=NR;i<2;i++){print "LOST TITLE"}}'	|
-	# sコマンドの前に数字を置くことで対象行を絞って置換を行う
-    sed -e '1s/^/prev:/' -e '2s/^/next:/'				|
-    # 1行に変換。navに記録
-	tr '\n' ' '					> "$datadir/$d/nav"
+# make post list with deleted posts
+sort -m $tmp-old-post-list "$datadir/post_list" |
+uniq > $tmp-new-old-list
+
+cat $tmp-git-change > /tmp/changed    # デバッグ用
+
+# make list of posts whose nav must be changed
+cat $tmp-git-change                             |
+xargs -I@ -n 1 grep -C1 "@$" $tmp-new-old-list  |
+sort -u > /tmp/related
+cat $tmp-new-old-list | sort -u                 |
+while read ymd hms d ; do
+        [ -f "$contentsdir/$d/main.md" ] || continue
+        grep -C1 "$d$" "$datadir/post_list"                             |
+        awk '{print $3}'                                                |
+        sed -n -e '1p' -e '$p'                                          |
+        xargs -I@ cat "$datadir/@/link"                                 |
+        awk 'NR<=2{print}END{for(i=NR;i<2;i++){print "LOST TITLE"}}'    |
+        sed -e '1s/^/prev:/' -e '2s/^/next:/'                           |
+        tr '\n' ' '                                     > "$datadir/$d/nav"
 done
 
 ## make keyword list 
