@@ -4,7 +4,8 @@ exec 2> "$logdir/$(basename $0).$(date +%Y%m%d_%H%M%S).$$"
 [ -n "${CONTENT_LENGTH}" ] && dd bs=${CONTENT_LENGTH} > /dev/null
 tmp=/tmp/$$
 echo -e 'Content-type: text/html\n\n'
-
+date
+echo "スタート"
 cd "$contentsdir"
 git fetch origin master
 git diff --name-status HEAD origin/master |
@@ -13,12 +14,15 @@ grep -Eo '(posts|pages)/[^/]+'             |
 sort -u                                    > $tmp-git-change
 
 git pull
+date
+echo "pull"
 
 # INITがあったら全記事更新
 [ -f "$datadir/INIT" ] &&
 find posts pages -type d       |
 grep -Eo '(posts|pages)/[^/]+' > $tmp-git-change
-
+date
+echo "all update"
 rm -f "$datadir/INIT"
 
 ## create/delete article directory 
@@ -64,7 +68,8 @@ do
 
     touch "$datadir/$d/nav"
 done
-
+date
+echo "日付系リンク"
 ## make post/page list
 #tmp=/tmp/$$
 touch "$datadir/post_list"
@@ -96,18 +101,20 @@ mv $tmp-post_list "$datadir/post_list"
 # list pages data
 awk '$3~/^pages/' $tmp-list  > $tmp-page_list
 mv $tmp-page_list "$datadir/page_list"
-
+date
+echo "listの出力"
 # make post list with deleted posts
 sort -m $tmp-old-post-list "$datadir/post_list" |
 uniq > $tmp-new-old-list
 
-cat $tmp-git-change > /tmp/changed    # デバッグ用
+#cat $tmp-git-change > /tmp/changed    # デバッグ用
 
 # make list of posts whose nav must be changed
 cat $tmp-git-change                             |
 xargs -I@ -n 1 grep -C1 "@$" $tmp-new-old-list  |
-sort -u > /tmp/related
-cat $tmp-new-old-list | sort -u                 |
+#sort -u > /tmp/related
+#cat $tmp-new-old-list | sort -u                 |
+sort -u |
 while read ymd hms d ; do
         [ -f "$contentsdir/$d/main.md" ] || continue
         grep -C1 "$d$" "$datadir/post_list"                             |
@@ -118,7 +125,8 @@ while read ymd hms d ; do
         sed -e '1s/^/prev:/' -e '2s/^/next:/'                           |
         tr '\n' ' '                                     > "$datadir/$d/nav"
 done
-
+date
+echo "navりすと出力"
 ## make keyword list 
 cd "$contentsdir"
 # posts pagesのymd hms pathデータ 
@@ -137,7 +145,8 @@ sed 's/  */ /g'                  |
 awk '{gsub(/^/,",",$2);print}'   |
 sed 's/$/,/'                     > $tmp-keyword_list
 mv $tmp-keyword_list "$datadir/keyword_list"
-
+date
+echo "キーワード"
 ### MAKE SEARCH FILE ###
 cd "$contentsdir"
 cat $tmp-list                    |
@@ -152,3 +161,5 @@ awk '$2~/^\*$|^#*$/{$2=""}{print}'              |
 # 空行除去
 awk 'NF>1'                      > $tmp-all
 mv $tmp-all "$datadir/all_markdown"
+date
+echo "検索"
