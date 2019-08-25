@@ -20,21 +20,20 @@ find posts pages -type d       |
 grep -Eo '(posts|pages)/[^/]+' > $tmp-git-change
 
 rm -f "$datadir/INIT"
-cat $tmp-git-change > /tmp/diff
 
-## create timestamp file
-# posts, pages以下のdirを探す
-find posts pages -maxdepth 1 -type d	|
-# posts/, pages/ よりも下層に限定する
-grep /					|
-# 一つずつ$dに格納しdo 以下の処理を行う
+## create/delete article directory 
+# 変更があったものだけcatする
+cat $tmp-git-change |
 while read d
 do
-    # main.mdがあるかどうか
-    [ -f "$contentsdir/$d/main.md" ] &&
-    # あれば$datadirに同じ階層構造のdirをつくる
+    # 無い場合はdatadirの削除
+    [ -f "$contentsdir/$d/main.md" ] || rm -Rf "$datadir/$d"
+    # ある場合は次の処理へ(mkdir)
+    # 無い場合次のループへ   
+    [ -f "$contentsdir/$d/main.md" ] || continue
+
     mkdir -p "$datadir/$d"           &&
-    ## add timestamp file
+    ## add time stampfiles 
     git log -p "$contentsdir/$d/main.md" |
     grep '^Date:'                        |
     awk '{print $2,$3,$4,$5,$6}'         |
@@ -42,57 +41,29 @@ do
     awk -v cf="$datadir/$d/created_time" \
         -v mf="$datadir/$d/modified_time" \
         'NR==1{print > mf}END{print > cf}'
-done
 
-## delte delted articles
-cd  "$datadir"
-# posts, pages以下のdirを探す
-find posts pages -maxdepth 1 -type d    |
-# posts/, pages/ よりも下層に限定する
-grep /					|
-# 一つずつ$dに格納しdo 以下の処理を行う
-while read d
-do
-    # main.mdがあるかどうか
-    # ある場合は次のループへ
-    # 無い場合は次の処理へ（rm）
-    [ -f "$contentsdir/$d/main.md" ] && continue
-    rm -rf "./$d"
-done
-
-## make shortcut
-find posts pages -maxdepth 1 -type d    |
-grep /					|
-while read d
-do
-    # ある場合は次の処理へ(grep)
-    # 無い場合次のループへ
-    [ -f "$contentsdir/$d/main.md" ] || continue
-    # タイトル行の最初の１つのみ
-    grep -m 1 '^# '  "$contentsdir/$d/main.md"  |
-    # ^#を取り除く
-    sed 's/^# *//'                              |
+    ## make some snips
+    # タイトル行の最初の一つのみ
+    grep -m 1 '^# ' "$contentsdir/$d/main.md"           |
+    # マークダウンの先頭の#を取り除く
+    sed 's/^#  *//'                                     |
     # /^$/: title行の# 以降が空白 >> "NO TITLE"
     # if(NR==0) : title行がない(#の行がない) (NR==0というのはNRが無いっていうこと)
     awk '{if(/^$/){print "NO TITLE"}else{print}}
-        END{if(NR==0){print "NO TITLE"}}'       |
+         END{if(NR==0){print "NO TITLE"}}'              |
     # ナビゲーションのためとmeta.yamlでつかう
-    tee "$datadir/$d/title"                     |
+    tee "$datadir/$d/title"                             |
     # s/を=に置換
     # リンク先をlinkファイルに保存
     awk -v d="$d" '{gsub(/s\//,"=",d);
         print "<a href=\"/?" d "\">" $0 "</a>"}' > "$datadir/$d/link"
-	
-	# 日付付きリンク
+    # 日付付きリンク
     # 半角スペース以降を無にする
     ymd=$(sed 's/ .*//' < "$datadir/$d/created_time")
-    # &があるとマッチした場所の前に追記される
     sed "s;</a>; ($ymd)&;" "$datadir/$d/link" > "$datadir/$d/link_date"
-
 
     touch "$datadir/$d/nav"
 done
-
 
 ## make post/page list
 tmp=/tmp/$$
