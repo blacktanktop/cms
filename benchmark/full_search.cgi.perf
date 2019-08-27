@@ -1,0 +1,26 @@
+#!/bin/bash
+url='https://blog.blacktanktop.me/full_search.cgi?word='
+
+search (){
+    curl $url$1 2> /dev/null |
+    grep '<a href'           |
+    wc -l                    |
+    #直接画面へ送る
+    sed 's/^/hits: /' > /dev/tty
+}
+
+for i in {1..10} ; do
+    秒で出力
+    time -p search $1
+done                               |&
+# realの値を抽出
+grep ^real                         |
+# 数値の取得
+awk '{printf $2","}'               |
+# octave計算用に配列に入れる、末尾の,処理
+sed -e 's/.*/[&]/' -e 's/,]$/]\n/' |
+# 数値ベクトルを画面に表示(パイプするとその値は表示されないが)
+# これによって表示できる
+tee /dev/tty                       |
+sed 's/.*/disp("mean:");mean(&)\ndisp("stddev:");std(&)/'  |
+octave -q
