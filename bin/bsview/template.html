@@ -74,8 +74,8 @@ Content-type: text/html
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
     <div class="container">
-      <h1 class="display-3">Hello, world!</h1>
-      <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+      <h1 class="display-3">くろたんくブログ</h1>
+      <p>Practice Makes Permanent</p>
       <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
     </div>
   </div>
@@ -85,7 +85,7 @@ Content-type: text/html
     <div class="row">
       <div class="col-md-8">
         $body$
-        <div class="card" id="article-info">
+        <div class="card"  id="article-info">
           <h4 class="card-header">Article Info</h4>
           <p style="padding:5px">created: $created_time$<br />
             modified: $modified_time$<br />
@@ -95,9 +95,11 @@ Content-type: text/html
           </p>
       </div>
     </div>
-    <div class="col-md-4">
-	  検索機能
-　	</div>
+    <div class="col-md-4" id="widgets">
+      <aside id="last-articles"></aside>
+      <br />
+      <aside id="rank-articles"></aside>
+    </div>
 　</div>
  
     <hr>
@@ -110,11 +112,10 @@ Content-type: text/html
 </main>
 
 <footer class="container">
-  <p>&copy; Company 2017-2019</p>
 </footer>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-
+<script src="/bsview/main.js"></script>
     <!--i<script>window.jQuery || document.write('<script src="/docs/4.3/assets/js/vendor/jquery-slim.min.js"><\/script>')</script><script src="/docs/4.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o" crossorigin="anonymous"></script>-->
     </body>
 </html>
