@@ -28,13 +28,14 @@ counter="$datadir/counters/$(tr '/' '_' <<< $dir)"
 # 都度1と追記。それをファイルサイズでカウントする'$(ls -l "$counter" | cut -d' ' -f 5)'
 echo -n 1 >> "$counter" # increment the counter
 
-cat << FIN > $tmp-meta.yaml
+cat << FIN | tee /tmp/hogehoge > $tmp-meta.yaml
 ---
 created_time: '$(date -f - < "$datadir/$dir/created_time")'
 modified_time: '$(date -f - < "$datadir/$dir/modified_time")'
 title: '$(cat "$datadir/$dir/title")'
 nav: '$(cat "$datadir/$dir/nav")'
 views: '$(ls -l "$counter" | cut -d' ' -f 5)'
+$(cat "$contentsdir/config.yaml" )
 ---
 FIN
 
@@ -48,4 +49,7 @@ pandoc --template="$viewdir/template.html" \
 sed -r "/:\/\/|=\"\//!s;<(img src|a href)=\";&/$dir/;"	            	|
 # リンク内移動用の復旧
 # href=#white"がhref="/$dir/#white"となるが、それを元に戻す
-sed "s;/$dir/#;#;g"
+sed "s;/$dir/#;#;g"                                                     |
+# gihub-markdownのリンク先勝手に表示しちゃう問題対策
+# href="<a href="の後ろの文字列をhref=後ろの文字列という変換にする
+sed 's;href="<a href="\(.*\)"[^>]*>.*</a>";href="\1";'
