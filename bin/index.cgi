@@ -17,7 +17,8 @@ dir="$(tr -dc 'a-zA-Z0-9_=' <<< ${QUERY_STRING} | sed 's/fbclid=.*//' | sed 's;=
 # -z は文字列が長さが0なら真つまり空ならdir="pages/top"
 [ -z "$dir" ] && dir="pages/top"
 # 最新postのpathをdirに代入
-[ "$dir" = "post" ] && dir="$(tail -n 1 "$datadir/post_list" | cut -d' ' -f 3)" 
+# リダイレクト設定
+[ "$dir" = "post" ] && echo -e Location: "$(cat $datadir/last_post)\n" && exit 0
 md="$contentsdir/$dir/main.md"
 #実際のファイルかどうか
 [ -f "$md" ]
