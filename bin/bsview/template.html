@@ -8,13 +8,15 @@ Content-type: text/html
     <meta name="description" content="">
    <!--<meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">-->
    <!--<meta name="generator" content="Jekyll v3.8.5">-->
-    <title>$title$</title>
+    <title>$title$ | $sitetitle$</title>
 
     <!--<link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/jumbotron/">-->
 
     <!-- Bootstrap core CSS -->
 <!--<link href="/docs/4.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <style>
       .bd-placeholder-img {
         font-size: 1.125rem;
@@ -36,8 +38,10 @@ Content-type: text/html
     <link href="/bsview/jumbotron.css" rel="stylesheet">
   </head>
   <body>
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v4.0"></script>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-  <a class="navbar-brand" href="#">くろたんくブログ</a>
+  <a class="navbar-brand" href="$protocol$//$host$">$sitetitle$</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -51,7 +55,7 @@ Content-type: text/html
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">$links.text$</a>
           <div class="dropdown-menu" aria-labelledby="dropdown01">
             $for(links.sublinks)$
-            <a class="dropdown-item" href="$links.sublinks.href$">$links.sublinks.text$</a>
+            <a class="dropdown-item" href="$links.sublinks.href$" target="_blank">$links.sublinks.text$</a>
             $endfor$
         </div>
         $else$
@@ -73,8 +77,8 @@ Content-type: text/html
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron">
     <div class="container">
-      <h1 class="display-3">くろたんくブログ</h1>
-      <p>Practice Makes Permanent</p>
+      <h1>$sitetitle$</h1>
+      <p>$sitesubtitle$</p>
       <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
     </div>
   </div>
@@ -83,6 +87,24 @@ Content-type: text/html
     <!-- Example row of columns -->
     <div class="row">
       <div class="col-md-8" id="article-body">
+        $if(hatena)$
+        <a href="https://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/v4/public/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+        $endif$
+
+        $if(twitter)$
+        <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-via="$twitter$" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        $endif$
+        $if(line)$
+		<div class="line-it-button" data-lang="ja" data-type="like" data-url="$protocol$//$host$$page$" data-share="true" style="display: none;"></div>
+		<script src="https://d.line-scdn.net/r/web/social-plugin/js/thirdparty/loader.min.js" async="async" defer="defer"></script>
+        $endif$
+        $if(facebook)$
+        <div class="fb-like" data-href"$protocol$//$host$$page$" data-width="" data-layout="button_count" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
+        $endif$
+        $if(pocket)$
+        <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
+        <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
+        $endif$
         $body$
         <div class="card"  id="article-info">
           <h4 class="card-header">Article Info</h4>
@@ -95,7 +117,13 @@ Content-type: text/html
       </div>
     </div>
     <div class="col-md-4" id="widgets">
-      <aside id="last-articles"></aside>
+      $if(sociallinks)$
+      <h1>Who am I</h1>
+      $endif$
+      $for(sociallinks)$
+      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-3x"></i></a>
+      $endfor$
+	  <aside id="last-articles"></aside>
       <br />
       <aside id="rank-articles"></aside>
     </div>

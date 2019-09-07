@@ -13,7 +13,7 @@ trap 'rm -f $tmp-*' EXIT
 # QUERY_STRINGにhttps://blog.blacktanktop.me?XXXXXのXXXXXが入るイメージ
 # $$はプロセス番号
 tmp=/tmp/$$
-dir="$(tr -dc 'a-zA-Z0-9_=' <<< ${QUERY_STRING} | sed 's;=;s/;')"
+dir="$(tr -dc 'a-zA-Z0-9_=' <<< ${QUERY_STRING} | sed 's/fbclid=.*//' | sed 's;=;s/;')"
 # -z は文字列が長さが0なら真つまり空ならdir="pages/top"
 [ -z "$dir" ] && dir="pages/top"
 # 最新postのpathをdirに代入
@@ -36,6 +36,7 @@ title: '$(cat "$datadir/$dir/title")'
 nav: '$(cat "$datadir/$dir/nav")'
 views: '$(ls -l "$counter" | cut -d' ' -f 5)'
 $(cat "$contentsdir/config.yaml" )
+page: $(sed -e 's;^;/?;' -e 's;s/;=;' <<< $dir)
 ---
 FIN
 
