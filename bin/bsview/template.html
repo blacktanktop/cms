@@ -124,35 +124,31 @@ Content-type: text/html
         <a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"></a>
         <script type="text/javascript">!function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");</script>
         $endif$
+        <p id="article-info">
+          <strong style="font-size:100%">$created_time$</strong>(modified: $modified_time$)<br />
+          views: $views$, keywords: <span id="keywords">$Keywords$</span></br>
+        </p>
         $body$
-        <div class="card"  id="article-info">
-          <h4 class="card-header">Article Info</h4>
-          <p style="padding:5px">created: $created_time$<br />
-            modified: $modified_time$<br />
-            views: $views$<br />
-            keywords: <span id="keywords">$Keywords$</span></br>
-            $nav$
-          </p>
+        $nav$
       </div>
-    </div>
-    <div class="col-md-4" id="widgets">
-      <!--
-      $if(sociallinks)$
-      <h1>Who am I</h1>
-      $endif$
-      $for(sociallinks)$
-      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-3x my-gray"></i></a>
-      $endfor$
-      -->
-	  <aside id="last-articles"></aside>
-      <br />
-      <aside id="rank-articles"></aside>
-    </div>
-　</div>
+      <div class="col-md-4" id="widgets">
+        <!--
+        $if(sociallinks)$
+        <h1>Who am I</h1>
+        $endif$
+        $for(sociallinks)$
+        <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-3x my-gray"></i></a>
+        $endfor$
+        -->
+  	  <aside id="last-articles"></aside>
+        <br />
+        <aside id="rank-articles"></aside>
+      </div>
+  　</div>
  
     <hr>
     <footer>
-      <p>$Copyright$</p>
+      <p>$Copyright$<a href="https://blog.blacktanktop.me/?page=privacy">    くろたんくブログについて</a></p>
     </footer>
 
   </div> <!-- /container -->
