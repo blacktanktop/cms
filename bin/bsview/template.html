@@ -3,6 +3,16 @@ Content-type: text/html
 <!doctype html>
 <html lang="ja">
   <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-147411917-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	
+	  gtag('config', 'UA-147411917-1');
+	</script>
+ 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -45,8 +55,8 @@ Content-type: text/html
   <body>
     <div id="fb-root"></div>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v4.0"></script>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-  <a class="navbar-brand" href="$protocol$//$host$">$sitetitle$</a>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top navbar-custom">
+  <a class="navbar-brand" href="$protocol$//$host$">$sitetitle_en$</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -70,9 +80,14 @@ Content-type: text/html
         $endif$
       $endfor$ 
     </ul>
+      $if(sociallinks)$
+      $endif$
+      $for(sociallinks)$
+      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-2x my-white mr-2"></i></a>
+      $endfor$
     <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" id="full-search-box">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="fullSearch()">Search</button>
+      <input class="form-control form-control-sm mr-2" type="text" placeholder="ブログ内検索" aria-label="Search" id="full-search-box">
+      <button class="btn btn-outline-light btn-sm" type="button" onclick="fullSearch()">検索</button>
     </form>
   </div>
 </nav>
@@ -83,8 +98,7 @@ Content-type: text/html
   <div class="jumbotron">
     <div class="container">
       <h1>$sitetitle$</h1>
-      <p>$sitesubtitle$</p>
-      <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      <h2>$sitesubtitle$</h2>
     </div>
   </div>
 
@@ -122,12 +136,14 @@ Content-type: text/html
       </div>
     </div>
     <div class="col-md-4" id="widgets">
+      <!--
       $if(sociallinks)$
       <h1>Who am I</h1>
       $endif$
       $for(sociallinks)$
-      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-3x"></i></a>
+      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-3x my-gray"></i></a>
       $endfor$
+      -->
 	  <aside id="last-articles"></aside>
       <br />
       <aside id="rank-articles"></aside>
