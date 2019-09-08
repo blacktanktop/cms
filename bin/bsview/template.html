@@ -12,7 +12,6 @@ Content-type: text/html
 	
 	  gtag('config', 'UA-147411917-1');
 	</script>
- 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -79,12 +78,12 @@ Content-type: text/html
       </li>
         $endif$
       $endfor$ 
-    </ul>
       $if(sociallinks)$
       $endif$
       $for(sociallinks)$
       <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-2x my-white mr-2"></i></a>
       $endfor$
+    </ul>
     <form class="form-inline my-2 my-lg-0">
       <input class="form-control form-control-sm mr-2" type="text" placeholder="ブログ内検索" aria-label="Search" id="full-search-box">
       <button class="btn btn-outline-light btn-sm" type="button" onclick="fullSearch()">検索</button>
