@@ -9,3 +9,10 @@ body {
 .fb_iframe_widget > span {
           vertical-align: baseline !important;
 }
+/*icon color*/
+.my-gray {color: gray}
+.my-white {color: #ffffff}
+
+.navbar-custom {
+    background-color: #85acde;
+}
