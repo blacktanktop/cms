@@ -74,7 +74,7 @@ Content-type: text/html
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">$links.text$</a>
           <div class="dropdown-menu" aria-labelledby="dropdown01">
             $for(links.sublinks)$
-            <a class="dropdown-item" href="$links.sublinks.href$" target="_blank">$links.sublinks.text$</a>
+            <a class="dropdown-item" href="$links.sublinks.href$">$links.sublinks.text$</a>
             $endfor$
         </div>
         $else$
