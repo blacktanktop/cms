@@ -67,7 +67,7 @@ Content-type: text/html
       $if(sociallinks)$
       $endif$
       $for(sociallinks)$
-      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-2x my-white mr-2"></i></a>
+      <a href="$sociallinks.href$" target="_blank"><i class="fa $sociallinks.icon$ fa-3x my-white mr-2"></i></a>
       $endfor$
       $for(links)$
         $if(links.sublinks)$
@@ -78,7 +78,7 @@ Content-type: text/html
             $for(links.sublinks)$
             <a class="dropdown-item" href="$links.sublinks.href$">$links.sublinks.text$</a>
             $endfor$
-        </div>
+          </div>
         $else$
         <li class="nav-item active">
           <a class="nav-link" href="$links.href$">$links.text$</a>
