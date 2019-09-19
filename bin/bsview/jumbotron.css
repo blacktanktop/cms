@@ -14,9 +14,16 @@ body {
 .my-white {color: #ffffff}
 
 .navbar-custom {
-    background-color: #85acde;
+/*    background-color: #85acde;
+*/
+    background-color: #3EDBCB;
 }
 
 .jumbotron {
-    background-color: #c9e1ff !important; 
+/*    background-color: #c9e1ff !important; 
+*/
+    background-color: #94EBE2 !important; 
 }
+
+.jumbotron h1{color: #333333;}
+.jumbotron h2{color: #333333;}
